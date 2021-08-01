@@ -1,11 +1,11 @@
 <?php
 /**
-*
-* @package Bulk User Add Extension
-* @copyright (c) 2019 david63
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-*/
+ *
+ * @package Bulk User Add Extension
+ * @copyright (c) 2019 david63
+ * @license GNU General Public License, version 2 (GPL-2.0)
+ *
+ */
 
 namespace david63\bulkuseradd\acp;
 
@@ -13,7 +13,7 @@ class bulkuseradd_module
 {
 	public $u_action;
 
-	function main($id, $mode)
+	public function main($id, $mode)
 	{
 		global $phpbb_container;
 
@@ -30,7 +30,7 @@ class bulkuseradd_module
 				// Make the $u_action url available in the admin controller
 				$admin_controller->set_page_url($this->u_action);
 				$admin_controller->display_options();
-			break;
+				break;
 
 			case 'upload':
 				$this->tpl_name = 'bulkuseradd_upload';
@@ -41,7 +41,7 @@ class bulkuseradd_module
 				// Make the $u_action url available in the admin controller
 				$admin_controller->set_page_url($this->u_action);
 				$admin_controller->upload_file();
-			break;
+				break;
 		}
 	}
 }

@@ -1,11 +1,11 @@
 <?php
 /**
-*
-* @package Bulk User Add Extension
-* @copyright (c) 2019 david63
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-*/
+ *
+ * @package Bulk User Add Extension
+ * @copyright (c) 2019 david63
+ * @license GNU General Public License, version 2 (GPL-2.0)
+ *
+ */
 
 namespace david63\bulkuseradd\controller;
 
@@ -18,69 +18,74 @@ use phpbb\language\language;
 use david63\bulkuseradd\core\functions;
 
 /**
-* Admin manage controller
-*/
-class acp_manage_controller implements acp_manage_interface
+ * Admin manage controller
+ */
+class acp_manage_controller
 {
-	/** @var \phpbb\config\config */
+	/** @var config */
 	protected $config;
 
-	/** @var \phpbb\request\request */
+	/** @var request */
 	protected $request;
 
-	/** @var \phpbb\template\template */
+	/** @var template */
 	protected $template;
 
-	/** @var \phpbb\user */
+	/** @var user */
 	protected $user;
 
-	/** @var \phpbb\log\log */
+	/** @var log */
 	protected $log;
 
-	/** @var \phpbb\language\language */
+	/** @var language */
 	protected $language;
 
-	/** @var \david63\bulkuseradd\core\functions */
+	/** @var functions */
 	protected $functions;
+
+	/** @var string */
+	protected $ext_images_path;
 
 	/** @var string Custom form action */
 	protected $u_action;
 
 	/**
-	* Constructor for admin manage controller
-	*
-	* @param \phpbb\config\config					$config			Config object
-	* @param \phpbb\request\request					$request		Request object
-	* @param \phpbb\template\template				$template		Template object
-	* @param \phpbb\user							$user			User object
-	* @param \phpbb\log\log							$log			Log object
-	* @param \phpbb\language\language				$language		Language object
-	* @param \david63\bulkuseradd\core\functions	functions		Functions for the extension
-	*
-	* @return \david63\bulkuseradd\controller\acp_manage_controller
-	* @access public
-	*/
-	public function __construct(config $config, request $request, template $template, user $user, log $log, language $language, functions $functions)
+	 * Constructor for admin manage controller
+	 *
+	 * @param config		$config         	Config object
+	 * @param request		$request        	Request object
+	 * @param template		$template       	Template object
+	 * @param user			$user           	User object
+	 * @param log			$log            	Log object
+	 * @param language		$language       	Language object
+	 * @param functions		functions       	Functions for the extension
+	 * @param string		$ext_images_path	Path to this extension's images
+	 *
+	 * @return \david63\bulkuseradd\controller\acp_manage_controller
+	 * @access public
+	 */
+	public function __construct(config $config, request $request, template $template, user $user, log $log, language $language, functions $functions, string $ext_images_path)
 	{
-		$this->config		= $config;
-		$this->request		= $request;
-		$this->template		= $template;
-		$this->user			= $user;
-		$this->log			= $log;
-		$this->language		= $language;
-		$this->functions	= $functions;
+		$this->config    		= $config;
+		$this->request   		= $request;
+		$this->template  		= $template;
+		$this->user      		= $user;
+		$this->log       		= $log;
+		$this->language  		= $language;
+		$this->functions 		= $functions;
+		$this->ext_images_path	= $ext_images_path;
 	}
 
 	/**
-	* Display the options a user can configure for this extension
-	*
-	* @return null
-	* @access public
-	*/
+	 * Display the options a user can configure for this extension
+	 *
+	 * @return null
+	 * @access public
+	 */
 	public function display_options()
 	{
 		// Add the language files
-		$this->language->add_lang(array('acp_bulkuseradd', 'acp_common'), $this->functions->get_ext_namespace());
+		$this->language->add_lang(['acp_bulkuseradd', 'acp_common'], $this->functions->get_ext_namespace());
 
 		// Create a form key for preventing CSRF attacks
 		$form_key = 'bulkuseradd';
@@ -111,44 +116,50 @@ class acp_manage_controller implements acp_manage_interface
 
 		// Template vars for header panel
 		$version_data	= $this->functions->version_check();
+		$valid 			= $this->functions->ext_requirements();
 
-		$this->template->assign_vars(array(
-			'DOWNLOAD'			=> (array_key_exists('download', $version_data)) ? '<a class="download" href =' . $version_data['download'] . '>' . $this->language->lang('NEW_VERSION_LINK') . '</a>' : '',
+		$this->template->assign_vars([
+			'DOWNLOAD' 			=> (array_key_exists('download', $version_data)) ? '<a class="download" href =' . $version_data['download'] . '>' . $this->language->lang('NEW_VERSION_LINK') . '</a>' : '',
 
-			'HEAD_TITLE'		=> $this->language->lang('BULK_USER_ADD_MANAGE'),
+			'EXT_IMAGE_PATH'	=> $this->ext_images_path,
+
+			'HEAD_TITLE' 		=> $this->language->lang('BULK_USER_ADD_MANAGE'),
 			'HEAD_DESCRIPTION'	=> $this->language->lang('BULK_USER_ADD_MANAGE_EXPLAIN'),
 
-			'NAMESPACE'			=> $this->functions->get_ext_namespace('twig'),
+			'NAMESPACE' 		=> $this->functions->get_ext_namespace('twig'),
 
-			'S_BACK'			=> $back,
-			'S_VERSION_CHECK'	=> (array_key_exists('current', $version_data)) ? $version_data['current'] : false,
+			'PHP_VALID' 		=> $valid[0],
+			'PHPBB_VALID' 		=> $valid[1],
 
-			'VERSION_NUMBER'	=> $this->functions->get_meta('version'),
-		));
+			'S_BACK' 			=> $back,
+			'S_VERSION_CHECK' 	=> (array_key_exists('current', $version_data)) ? $version_data['current'] : false,
 
-		$this->template->assign_vars(array(
-			'CSV_DELIMITER'		=> isset($this->config['bua_csv_delimiter']) ? $this->config['bua_csv_delimiter'] : '',
+			'VERSION_NUMBER' 	=> $this->functions->get_meta('version'),
+		]);
 
-			'DATE_TYPE'	   		=> isset($this->config['bua_date_type']) ? $this->config['bua_date_type'] : 1,
+		$this->template->assign_vars([
+			'CSV_DELIMITER' 	=> isset($this->config['bua_csv_delimiter']) ? $this->config['bua_csv_delimiter'] : '',
 
-			'EMAIL_COLUMN'	   	=> isset($this->config['bua_email_column']) ? $this->config['bua_email_column'] : '',
+			'DATE_TYPE' 		=> isset($this->config['bua_date_type']) ? $this->config['bua_date_type'] : 1,
 
-			'FIRST_DATA_ROW'	=> isset($this->config['bua_first_data_row']) ? $this->config['bua_first_data_row'] : 1,
+			'EMAIL_COLUMN' 		=> isset($this->config['bua_email_column']) ? $this->config['bua_email_column'] : '',
 
-			'SHEET_NAME'		=> isset($this->config['bua_sheet_name']) ? $this->config['bua_sheet_name'] : 'Sheet1',
+			'FIRST_DATA_ROW' 	=> isset($this->config['bua_first_data_row']) ? $this->config['bua_first_data_row'] : 1,
+
+			'SHEET_NAME' 		=> isset($this->config['bua_sheet_name']) ? $this->config['bua_sheet_name'] : 'Sheet1',
 			'START_DATE_COLUMN'	=> isset($this->config['bua_start_date_column']) ? $this->config['bua_start_date_column'] : '',
 
-			'USERNAME_COLUMN'	=> isset($this->config['bua_username_column']) ? $this->config['bua_username_column'] : '',
-			'U_ACTION'			=> $this->u_action,
-		));
+			'USERNAME_COLUMN' 	=> isset($this->config['bua_username_column']) ? $this->config['bua_username_column'] : '',
+			'U_ACTION' 			=> $this->u_action,
+		]);
 	}
 
 	/**
-	* Set the options a user can configure
-	*
-	* @return null
-	* @access protected
-	*/
+	 * Set the options a user can configure
+	 *
+	 * @return null
+	 * @access protected
+	 */
 	protected function set_options()
 	{
 		$this->config->set('bua_csv_delimiter', $this->request->variable('bua_csv_delimiter', ','));
@@ -161,12 +172,12 @@ class acp_manage_controller implements acp_manage_interface
 	}
 
 	/**
-	* Set page url
-	*
-	* @param string $u_action Custom form action
-	* @return null
-	* @access public
-	*/
+	 * Set page url
+	 *
+	 * @param string $u_action Custom form action
+	 * @return null
+	 * @access public
+	 */
 	public function set_page_url($u_action)
 	{
 		return $this->u_action = $u_action;

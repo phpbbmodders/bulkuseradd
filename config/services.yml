@@ -1,51 +1,30 @@
 imports:
     - { resource: parameters.yml }
+    - { resource: alias.yml }
 
 services:
+    _defaults:
+        autowire: true
+        bind:
+            $root_path: '%core.root_path%'
+            $php_ext: '%core.php_ext%'
+            $tables: '%tables%'
+            $ext_images_path: '%core.root_path%ext/david63/bulkuseradd/adm/style/images'
+        public: true
+
     david63.bulkuseradd.listener:
         class: david63\bulkuseradd\event\listener
-        arguments:
-            - '@dbal.conn'
-            - '%core.root_path%'
-            - '%core.php_ext%'
-            - '%tables%'
         tags:
             - { name: event.listener }
 
     david63.bulkuseradd.acp.manage.controller:
         class: david63\bulkuseradd\controller\acp_manage_controller
-        arguments:
-            - '@config'
-            - '@request'
-            - '@template'
-            - '@user'
-            - '@log'
-            - '@language'
-            - '@david63.bulkuseradd.core.functions'
 
     david63.bulkuseradd.acp.upload.controller:
         class: david63\bulkuseradd\controller\acp_upload_controller
-        arguments:
-            - '@config'
-            - '@cache'			
-            - '@request'
-            - '@template'
-            - '@user'
-            - '@log'
-            - '@language'
-            - '@dbal.conn'
-            - '%core.root_path%'
-            - '%core.php_ext%'
-            - '@passwords.manager'
-            - '@files.factory'
-            - '@david63.bulkuseradd.classes.read_filter'
-            - '@david63.bulkuseradd.core.functions'
-            - '%tables%'
 
     david63.bulkuseradd.core.functions:
         class: david63\bulkuseradd\core\functions
-        arguments:
-            - '@ext.manager'
 
     david63.bulkuseradd.classes.read_filter:
         class: david63\bulkuseradd\classes\read_filter
@@ -53,6 +32,3 @@ services:
             - '%start_row%'
             - '%end_row%'
             - '%columns%'
-
-    _defaults:
-        public: true

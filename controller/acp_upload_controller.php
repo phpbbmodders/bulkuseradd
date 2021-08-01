@@ -1,11 +1,11 @@
 <?php
 /**
-*
-* @package Bulk User Add Extension
-* @copyright (c) 2019 david63
-* @license GNU General Public License, version 2 (GPL-2.0)
-*
-*/
+ *
+ * @package Bulk User Add Extension
+ * @copyright (c) 2019 david63
+ * @license GNU General Public License, version 2 (GPL-2.0)
+ *
+ */
 
 namespace david63\bulkuseradd\controller;
 
@@ -25,32 +25,32 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 /**
-* Admin upload controller
-*/
-class acp_upload_controller implements acp_upload_interface
+ * Admin upload controller
+ */
+class acp_upload_controller
 {
-	/** @var \phpbb\config\config */
+	/** @var config */
 	protected $config;
 
-	/** @var \phpbb\cache\service */
+	/** @var service */
 	protected $cache;
 
-	/** @var \phpbb\request\request */
+	/** @var request */
 	protected $request;
 
-	/** @var \phpbb\template\template */
+	/** @var template */
 	protected $template;
 
-	/** @var \phpbb\user */
+	/** @var user */
 	protected $user;
 
-	/** @var \phpbb\log\log */
+	/** @var log */
 	protected $log;
 
-	/** @var \phpbb\language\language */
+	/** @var language */
 	protected $language;
 
-	/** @var \phpbb\db\driver\driver_interface */
+	/** @var driver_interface */
 	protected $db;
 
 	/** @var string phpBB root path */
@@ -62,80 +62,85 @@ class acp_upload_controller implements acp_upload_interface
 	/** @var factory */
 	protected $files_factory;
 
-	/** @var \phpbb\passwords\manager */
+	/** @var manager */
 	protected $passwords_manager;
 
-	/** @var \david63\bulkuseradd\classes\read_filter */
+	/** @var read_filter */
 	protected $read_filter;
 
-	/** @var \david63\bulkuseradd\core\functions */
+	/** @var functions */
 	protected $functions;
 
-	/** @var string phpBB tables */
+	/** @var array phpBB tables */
 	protected $tables;
 
+	/** @var string */
+	protected $ext_images_path;
+
 	/** @var allowed_extensions */
-	protected $allowed_extensions = array(
+	protected $allowed_extensions = [
 		'xls',
 		'xlsm',
 		'xlsx',
 		'csv',
-	);
+	];
 
 	/** @var string Custom form action */
 	protected $u_action;
 
 	/**
-	* Constructor for admin upload controller
-	*
-	* @param \phpbb\config\config								$config				Config object
-	* @param \phpbb\cache\service								$cache				Cache object
-	* @param \phpbb\request\request								$request			Request object
-	* @param \phpbb\template\template							$template			Template object
-	* @param \phpbb\user										$user				User object
-	* @param \phpbb\log\log										$log				Log object
-	* @param \phpbb\language\language							$language			Language object
-	* @param \phpbb_db_driver									$db					The db connection
-	* @param string 											$root_path			phpBB root path
-	* @param string												$php_ext			phpBB file extension
-	* @param \phpbb\passwords\manager							$passwords_manager	Password object
-	* @param factory											$files_factory		File object
-	* @param \david63\david63\spreadsheet\classes\read_filter	read_filter			Methods for the extension
-	* @param \david63\bulkuseradd\core\functions				functions			Functions for the extension
-	* @param array												$tables				phpBB db tables
-	*
-	* @return \david63\bulkuseradd\controller\acp_upload_controller
-	* @access public
-	*/
-	public function __construct(config $config, service $cache, request $request, template $template, user $user, log $log, language $language, driver_interface $db, $root_path, $php_ext, manager $passwords_manager, factory $files_factory, read_filter $read_filter, functions $functions, $tables)
+	 * Constructor for admin upload controller
+	 *
+	 * @param config            $config             Config object
+	 * @param service           $cache              Cache object
+	 * @param request           $request            Request object
+	 * @param template          $template           Template object
+	 * @param user              $user               User object
+	 * @param log               $log                Log object
+	 * @param language          $language           Language object
+	 * @param phpbb_db_driver   $db                 The db connection
+	 * @param string            $root_path          phpBB root path
+	 * @param string            $php_ext            phpBB file extension
+	 * @param manager           $passwords_manager  Password object
+	 * @param factory           $files_factory      File object
+	 * @param read_filter       read_filter         Methods for the extension
+	 * @param functions         $functions          Functions for the extension
+	 * @param array             $tables             phpBB db tables
+	 * @param string			$ext_images_path	Path to this extension's images
+	 *
+	 * @return \david63\bulkuseradd\controller\acp_upload_controller
+	 * @access public
+	 */
+	public function __construct(config $config, service $cache, request $request, template $template, user $user, log $log, language $language, driver_interface $db, string $root_path, string $php_ext, manager $passwords_manager, factory $files_factory, read_filter $read_filter, functions $functions, array $tables, string $ext_images_path)
 	{
-		$this->config				= $config;
-		$this->cache				= $cache;
-		$this->request				= $request;
-		$this->template				= $template;
-		$this->user					= $user;
-		$this->log					= $log;
-		$this->language				= $language;
-		$this->db					= $db;
-		$this->root_path 			= $root_path;
-		$this->php_ext				= $php_ext;
-		$this->passwords_manager	= $passwords_manager;
-		$this->files_factory		= $files_factory;
-		$this->read_filter			= $read_filter;
-		$this->functions			= $functions;
-		$this->tables				= $tables;
+		$this->config            	= $config;
+		$this->cache             	= $cache;
+		$this->request           	= $request;
+		$this->template          	= $template;
+		$this->user              	= $user;
+		$this->log               	= $log;
+		$this->language          	= $language;
+		$this->db                	= $db;
+		$this->root_path         	= $root_path;
+		$this->php_ext           	= $php_ext;
+		$this->passwords_manager 	= $passwords_manager;
+		$this->files_factory     	= $files_factory;
+		$this->read_filter       	= $read_filter;
+		$this->functions         	= $functions;
+		$this->tables            	= $tables;
+		$this->ext_images_path		= $ext_images_path;
 	}
 
 	/**
-	* Upload and/or process the file
-	*
-	* @return null
-	* @access public
-	*/
+	 * Upload and/or process the file
+	 *
+	 * @return null
+	 * @access public
+	 */
 	public function upload_file()
 	{
 		// Add the language files
-		$this->language->add_lang(array('acp_bulkuseradd', 'acp_common'), $this->functions->get_ext_namespace());
+		$this->language->add_lang(['acp_bulkuseradd', 'acp_common'], $this->functions->get_ext_namespace());
 
 		// Create a form key for preventing CSRF attacks
 		$form_key = 'bulkuseradd';
@@ -164,9 +169,9 @@ class acp_upload_controller implements acp_upload_interface
 			$allowed_extensions = $this->allowed_extensions;
 
 			// Upload the file
-			$upload_dir 	= $this->root_path . 'store/';
-			$fileupload 	= $this->files_factory->get('upload')->set_allowed_extensions($allowed_extensions);
-			$upload_file	= $fileupload->handle_upload('files.types.form', 'filename');
+			$upload_dir  = $this->root_path . 'store/';
+			$fileupload  = $this->files_factory->get('upload')->set_allowed_extensions($allowed_extensions);
+			$upload_file = $fileupload->handle_upload('files.types.form', 'filename');
 
 			// Has a file been selected?
 			if (!$upload_file->get('realname'))
@@ -196,7 +201,7 @@ class acp_upload_controller implements acp_upload_interface
 			$this->config->set('bua_upload_file_date', time(), true);
 
 			// Add action to the admin log
-			$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_BULK_USER_ADD_FILE_UPLOADED', time(), array($upload_file->get('uploadname'), $upload_file->get('realname')));
+			$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_BULK_USER_ADD_FILE_UPLOADED', time(), [$upload_file->get('uploadname'), $upload_file->get('realname')]);
 
 			// Confirm the udate to the user and provide link back to previous page
 			trigger_error($this->language->lang('FILE_UPLOADED') . adm_back_link($this->u_action));
@@ -218,18 +223,18 @@ class acp_upload_controller implements acp_upload_interface
 			}
 
 			// Let's start by getting the variables
-			$input_file_name 	= $this->root_path . 'store/' . $this->config['bua_real_file_name'];
-			$sheet_name 		= $this->config['bua_sheet_name'];
-			$first_data_row 	= $this->config['bua_first_data_row'];
-			$username_column 	= $this->config['bua_username_column'];
-			$email_column 		= $this->config['bua_email_column'];
-			$start_date_column	= $this->config['bua_start_date_column'];
+			$input_file_name   = $this->root_path . 'store/' . $this->config['bua_real_file_name'];
+			$sheet_name        = $this->config['bua_sheet_name'];
+			$first_data_row    = $this->config['bua_first_data_row'];
+			$username_column   = $this->config['bua_username_column'];
+			$email_column      = $this->config['bua_email_column'];
+			$start_date_column = $this->config['bua_start_date_column'];
 
 			// Create the column array
-			$columns = array(
+			$columns = [
 				$username_column,
 				$email_column,
-			);
+			];
 
 			$columns_add = ($start_date_column) ? array_push($columns, $start_date_column) : 0;
 
@@ -242,29 +247,29 @@ class acp_upload_controller implements acp_upload_interface
 				trigger_error($this->language->lang('FILE_IS_MISSING') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 
-			$reader 		= IOFactory::createReader($input_file_type);
+			$reader = IOFactory::createReader($input_file_type);
 			$reader->setLoadSheetsOnly($sheet_name);
 			$reader->setReadDataOnly(true);
-			$spreadsheet	= $reader->load($input_file_name);
-			$filter_subset 	= new $this->read_filter($first_data_row, $spreadsheet->getActiveSheet()->getHighestDataRow(), $columns);
+			$spreadsheet   = $reader->load($input_file_name);
+			$filter_subset = new $this->read_filter($first_data_row, $spreadsheet->getActiveSheet()->getHighestDataRow(), $columns);
 			$reader->setReadFilter($filter_subset);
-			$sheet_data 	= $spreadsheet->getActiveSheet()->toArray('', true, true, true);
+			$sheet_data = $spreadsheet->getActiveSheet()->toArray('', true, true, true);
 
 			// Load the user_add function to allow adding new users
 			if (!function_exists('user_add'))
 			{
-				include_once($this->root_path . 'includes/functions_user.' . $this->php_ext);
+				include_once $this->root_path . 'includes/functions_user.' . $this->php_ext;
 			}
 
 			// Find the group_id for the Registered Users group
 			$sql = 'SELECT group_id
-				FROM ' . $this->tables['groups'] . "
-				WHERE group_name = '" . $this->db->sql_escape('REGISTERED') . "'
-					AND group_type = " . GROUP_SPECIAL;
+                FROM ' . $this->tables['groups'] . "
+                WHERE group_name = '" . $this->db->sql_escape('REGISTERED') . "'
+                    AND group_type = " . GROUP_SPECIAL;
 
-			$result 	= $this->db->sql_query($sql);
-			$row 		= $this->db->sql_fetchrow($result);
-			$group_id	= $row['group_id'];
+			$result   = $this->db->sql_query($sql);
+			$row      = $this->db->sql_fetchrow($result);
+			$group_id = $row['group_id'];
 
 			$this->db->sql_freeresult($result);
 
@@ -275,61 +280,49 @@ class acp_upload_controller implements acp_upload_interface
 			{
 				if ($row >= $first_data_row && $row <= $spreadsheet->getActiveSheet()->getHighestRow())
 				{
-					if (strtolower($input_file_type) == 'csv')
-					{
-						$data = explode($this->config['bua_csv_delimiter'], $data[$this->config['bua_username_column']]);
-						$data[$this->config['bua_username_column']] = $data[0];
-						unset($data[0]);
-						$data[$this->config['bua_email_column']] = $data[1];
-						unset($data[1]);
-						$data[$this->config['bua_start_date_column']] = $data[2];
-						unset($data[2]);
-					}
-
 					// Check that the username does not already exist in the db
 					$username_clean = utf8_clean_string($data[$username_column]);
 
 					$sql = 'SELECT username_clean
-						FROM ' . $this->tables['users'] . "
-						WHERE username_clean = '" . $this->db->sql_escape($username_clean) . "'";
+                        FROM ' . $this->tables['users'] . "
+                        WHERE username_clean = '" . $this->db->sql_escape($username_clean) . "'";
 
-					$result	= $this->db->sql_query($sql);
-					$row 	= $this->db->sql_fetchrow($result);
+					$result = $this->db->sql_query($sql);
+					$row    = $this->db->sql_fetchrow($result);
 
 					$this->db->sql_freeresult($result);
 
 					// Let's validate the data
-					if ($row['username_clean'])
+					if ($row)
 					{
 						// Add log entry if username exists
-						$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_BULK_USER_ADD_FAILED', time(), array($data[$username_column]));
+						$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_BULK_USER_ADD_FAILED', time(), [$data[$username_column]]);
 					}
 					else if (!empty($data[$username_column]) || !empty($data[$email_column]))
 					{
 						if (empty($data[$username_column]))
 						{
 							// Add log entry if no username present
-							$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_BULK_USER_ADD_NO_USERNAME', time(), array($data[$email_column]));
+							$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_BULK_USER_ADD_NO_USERNAME', time(), [$data[$email_column]]);
 						}
 						else if (empty($data[$email_column]))
 						{
 							// Add log entry if no email present
-							$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_BULK_USER_ADD_NO_EMAIL', time(), array($data[$username_column]));
+							$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_BULK_USER_ADD_NO_EMAIL', time(), [$data[$username_column]]);
 						}
-
 						else // We are OK to process the data
 						{
-							$user_row = array(
-								'username'		=> $data[$username_column],
-								'user_password'	=> $this->passwords_manager->hash($data[$username_column]),
-								'user_email'	=> $data[$email_column],
-								'group_id'		=> $group_id,
-								'user_type'		=> USER_NORMAL,
-								'user_new'		=> 1,
-								'user_ip'		=> $this->user->ip,
+							$user_row = [
+								'username' => $data[$username_column],
+								'user_password' => $this->passwords_manager->hash($data[$username_column]),
+								'user_email' => $data[$email_column],
+								'group_id' => $group_id,
+								'user_type' => USER_NORMAL,
+								'user_new' => 1,
+								'user_ip' => $this->user->ip,
 								// Set this to force password change when logging in
-								'user_bulk_add'	=> 1,
-							);
+								'user_bulk_add' => 1,
+							];
 
 							//Let's deal with the start date
 							if ($start_date_column)
@@ -341,7 +334,7 @@ class acp_upload_controller implements acp_upload_interface
 									{
 										// Get the date into the correct format
 										$data[$start_date_column] = ($this->config['bua_date_type']) ? str_replace('/', '-', $data[$start_date_column]) : str_replace('-', '/', $data[$start_date_column]);
-										$start_date = strtotime($data[$start_date_column]);
+										$start_date               = strtotime($data[$start_date_column]);
 									}
 									else
 									{
@@ -358,7 +351,7 @@ class acp_upload_controller implements acp_upload_interface
 								// We'll set passchg date as well just in case the board is using this
 								$user_row['user_passchg'] = $start_date;
 							}
-
+							debug('user_row', $user_row);
 							// Add the user
 							user_add($user_row);
 							$users_added++;
@@ -371,7 +364,7 @@ class acp_upload_controller implements acp_upload_interface
 			$this->config->set('bua_update_file_date', time(), true);
 
 			// Add action to the admin log
-			$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_BULK_USER_ADD_PROCESSED', time(), array($this->config['bua_upload_file_name'], $users_added));
+			$this->log->add('admin', $this->user->data['user_id'], $this->user->ip, 'LOG_BULK_USER_ADD_PROCESSED', time(), [$this->config['bua_upload_file_name'], $users_added]);
 
 			// Confirm the update to the user and provide link back to previous page
 			trigger_error($this->language->lang('FILE_UPDATED') . adm_back_link($this->u_action));
@@ -384,41 +377,47 @@ class acp_upload_controller implements acp_upload_interface
 		}
 
 		// Template vars for header panel
-		$version_data	= $this->functions->version_check();
+		$version_data 	= $this->functions->version_check();
+		$valid 			= $this->functions->ext_requirements();
 
-		$this->template->assign_vars(array(
-			'DOWNLOAD'			=> (array_key_exists('download', $version_data)) ? '<a class="download" href =' . $version_data['download'] . '>' . $this->language->lang('NEW_VERSION_LINK') . '</a>' : '',
+		$this->template->assign_vars([
+			'DOWNLOAD' 			=> (array_key_exists('download', $version_data)) ? '<a class="download" href =' . $version_data['download'] . '>' . $this->language->lang('NEW_VERSION_LINK') . '</a>' : '',
 
-			'HEAD_TITLE'		=> $this->language->lang('UPLOAD'),
+			'EXT_IMAGE_PATH'	=> $this->ext_images_path,
+
+			'HEAD_TITLE' 		=> $this->language->lang('UPLOAD'),
 			'HEAD_DESCRIPTION'	=> $this->language->lang('UPLOAD_EXPLAIN'),
 
-			'NAMESPACE'			=> $this->functions->get_ext_namespace('twig'),
+			'NAMESPACE' 		=> $this->functions->get_ext_namespace('twig'),
 
-			'S_BACK'			=> $back,
-			'S_VERSION_CHECK'	=> (array_key_exists('current', $version_data)) ? $version_data['current'] : false,
+			'PHP_VALID' 		=> $valid[0],
+			'PHPBB_VALID' 		=> $valid[1],
 
-			'VERSION_NUMBER'	=> $this->functions->get_meta('version'),
-		));
+			'S_BACK' 			=> $back,
+			'S_VERSION_CHECK' 	=> (array_key_exists('current', $version_data)) ? $version_data['current'] : false,
 
-		$form_enctype	= (@ini_get('file_uploads') == '0' || strtolower(@ini_get('file_uploads')) == 'off') ? '' : ' enctype="multipart/form-data"';
-		$last_file 		= (!$this->config['bua_upload_file_name'] || !$this->config['bua_upload_file_date']) ? $this->language->lang('NO_FILE') : $this->language->lang('LAST_FILE', $this->config['bua_upload_file_name'], $this->user->format_date($this->config['bua_upload_file_date']));
-		$last_update 	= (!$this->config['bua_update_file_date']) ? $this->language->lang('NO_UPDATE') : $this->language->lang('LAST_UPDATE', $this->user->format_date($this->config['bua_update_file_date']));
+			'VERSION_NUMBER' 	=> $this->functions->get_meta('version'),
+		]);
 
-		$this->template->assign_vars(array(
-			'LAST_FILE'			=> $last_file,
-			'LAST_UPDATE'	   	=> $last_update,
+		$form_enctype = (@ini_get('file_uploads') == '0' || strtolower(@ini_get('file_uploads')) == 'off') ? '' : ' enctype="multipart/form-data"';
+		$last_file    = (!$this->config['bua_upload_file_name'] || !$this->config['bua_upload_file_date']) ? $this->language->lang('NO_FILE') : $this->language->lang('LAST_FILE', $this->config['bua_upload_file_name'], $this->user->format_date($this->config['bua_upload_file_date']));
+		$last_update  = (!$this->config['bua_update_file_date']) ? $this->language->lang('NO_UPDATE') : $this->language->lang('LAST_UPDATE', $this->user->format_date($this->config['bua_update_file_date']));
+
+		$this->template->assign_vars([
+			'LAST_FILE' 		=> $last_file,
+			'LAST_UPDATE'		=> $last_update,
 
 			'S_FORM_ENCTYPE'	=> $form_enctype,
-		));
+		]);
 	}
 
 	/**
-	* Set page url
-	*
-	* @param string $u_action Custom form action
-	* @return null
-	* @access public
-	*/
+	 * Set page url
+	 *
+	 * @param string $u_action Custom form action
+	 * @return null
+	 * @access public
+	 */
 	public function set_page_url($u_action)
 	{
 		return $this->u_action = $u_action;
