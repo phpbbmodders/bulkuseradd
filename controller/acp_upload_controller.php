@@ -351,7 +351,7 @@ class acp_upload_controller
 								// We'll set passchg date as well just in case the board is using this
 								$user_row['user_passchg'] = $start_date;
 							}
-							debug('user_row', $user_row);
+
 							// Add the user
 							user_add($user_row);
 							$users_added++;
