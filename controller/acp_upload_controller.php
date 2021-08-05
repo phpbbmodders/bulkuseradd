@@ -187,7 +187,7 @@ class acp_upload_controller
 
 			$upload_file->clean_filename('real');
 			$upload_file->move_file(str_replace($this->root_path, '', $upload_dir), true, true, 0644);
-			@chmod($upload_dir . $upload_file->get('real'), 0777);
+			chmod($upload_dir . $upload_file->get('real'), 0777);
 
 			// Are there any other errors?
 			if (sizeof($upload_file->error) && $upload_file->get('uploadname'))
@@ -217,9 +217,9 @@ class acp_upload_controller
 			}
 
 			// Check that update has not already been done
-			//if ($this->config['bua_update_file_date'] > $this->config['bua_upload_file_date'])
+			if ($this->config['bua_update_file_date'] > $this->config['bua_upload_file_date'])
 			{
-				//trigger_error($this->language->lang('UPDATE_ALREADY_DONE') . adm_back_link($this->u_action), E_USER_WARNING);
+				trigger_error($this->language->lang('UPDATE_ALREADY_DONE') . adm_back_link($this->u_action), E_USER_WARNING);
 			}
 
 			// Let's start by getting the variables
@@ -327,30 +327,38 @@ class acp_upload_controller
 							//Let's deal with the start date
 							if ($start_date_column)
 							{
-								if (!is_numeric($data[$start_date_column]))
+								if ($data[$start_date_column])
 								{
-									// Is the date from a CSV or Excel file?
-									if (is_string($data[$start_date_column]))
+									if (!is_numeric($data[$start_date_column]))
 									{
-										// Get the date into the correct format
-										$data[$start_date_column] = ($this->config['bua_date_type']) ? str_replace('/', '-', $data[$start_date_column]) : str_replace('-', '/', $data[$start_date_column]);
-										$start_date               = strtotime($data[$start_date_column]);
+										// Is the date from a CSV or Excel file?
+										if (is_string($data[$start_date_column]))
+										{
+											// Get the date into the correct format
+											$data[$start_date_column] = ($this->config['bua_date_type']) ? str_replace('/', '-', $data[$start_date_column]) : str_replace('-', '/', $data[$start_date_column]);
+											$start_date               = strtotime($data[$start_date_column]);
+										}
+										else
+										{
+											// Convert the Excel date into Unix timestamp
+											$start_date = Date::excelToTimestamp($data[$start_date_column]);
+										}
 									}
 									else
 									{
-										// Convert the Excel date into Unix timestamp
-										$start_date = Date::excelToTimestamp($data[$start_date_column]);
+										$start_date = $data[$start_date_column];
 									}
 								}
 								else
 								{
-									$start_date = $data[$start_date_column];
+									// If no start date present use today's date
+									$start_date = time();
 								}
-
-								$user_row['user_regdate'] = $start_date;
-								// We'll set passchg date as well just in case the board is using this
-								$user_row['user_passchg'] = $start_date;
 							}
+
+							$user_row['user_regdate'] = $start_date;
+							// We'll set passchg date as well just in case the board is using this
+							$user_row['user_passchg'] = $start_date;
 
 							// Add the user
 							user_add($user_row);
