@@ -325,34 +325,27 @@ class acp_upload_controller
 							];
 
 							//Let's deal with the start date
+							// If no date is entered then, by default, the current date is used
 							if ($start_date_column)
 							{
-								if ($data[$start_date_column])
+								if (!is_numeric($data[$start_date_column]))
 								{
-									if (!is_numeric($data[$start_date_column]))
+									// Is the date from a CSV or Excel file?
+									if (is_string($data[$start_date_column]))
 									{
-										// Is the date from a CSV or Excel file?
-										if (is_string($data[$start_date_column]))
-										{
-											// Get the date into the correct format
-											$data[$start_date_column] = ($this->config['bua_date_type']) ? str_replace('/', '-', $data[$start_date_column]) : str_replace('-', '/', $data[$start_date_column]);
-											$start_date               = strtotime($data[$start_date_column]);
-										}
-										else
-										{
-											// Convert the Excel date into Unix timestamp
-											$start_date = Date::excelToTimestamp($data[$start_date_column]);
-										}
+										// Get the date into the correct format
+										$data[$start_date_column] = ($this->config['bua_date_type']) ? str_replace('/', '-', $data[$start_date_column]) : str_replace('-', '/', $data[$start_date_column]);
+										$start_date               = strtotime($data[$start_date_column]);
 									}
 									else
 									{
-										$start_date = $data[$start_date_column];
+										// Convert the Excel date into Unix timestamp
+										$start_date = Date::excelToTimestamp($data[$start_date_column]);
 									}
 								}
 								else
 								{
-									// If no start date present use today's date
-									$start_date = time();
+									$start_date = $data[$start_date_column];
 								}
 							}
 
