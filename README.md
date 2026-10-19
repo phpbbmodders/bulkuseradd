@@ -15,7 +15,7 @@ Adds the ability to add users from an Excel spreadsheet or a CSV file.
 
 ## Minimum Requirements
 * phpBB 3.3.0
-* PHP 7.1.3
+* PHP 7.4
 
 ## Install
 1. [Download the latest release](https://github.com/david63/bulkuseradd/archive/3.2.zip) and unzip it.
