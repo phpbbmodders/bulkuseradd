@@ -23,7 +23,7 @@ class ext extends base
 	protected $min_version = '3.3.0';
 
 	/** @var PHP version */
-	protected $php_version = '7.1.3';
+	protected $php_version = '7.4.0';
 
 	/** @var phpBB check version */
 	protected $phpbb_version = '3.3.0';
