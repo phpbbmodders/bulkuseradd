@@ -20,55 +20,56 @@ class ext extends base
 	protected $max_version = '4.0.0@dev';
 
 	/** @var min phpBB version */
-	protected $min_version = '3.3.0';
+	protected $min_version = '3.3.19';
 
 	/** @var PHP version */
-	protected $php_version = '7.4.0';
+	protected $php_version = '8.3.36';
 
 	/** @var phpBB check version */
 	protected $phpbb_version = '3.3.0';
 
 	/**
-	* Enable extension if requirements are met
-	*
-	* @return bool True if can be enabled, False if not, or an error message in phpBB 3.3.
-	* @access public
-	*/
+	 * Check whether the extension can be enabled.
+	 * The current phpBB and PHP version should meet or
+	 * exceed the minimum version required by this extension:
+	 *
+	 * @return bool|array
+	 * @access public
+	 */
 	public function is_enableable()
 	{
-		// Check for PHP version
-		if (phpbb_version_compare(PHP_VERSION, $this->php_version, '<'))
-		{
-			if (phpbb_version_compare(PHPBB_VERSION, $this->phpbb_version, '>='))
-			{
-				$language = $this->container->get('language');
-				$language->add_lang('ext_enable_error', 'david63/'. $this->ext_name);
+		$enableable = $this->check_phpbb_version() && $this->check_php_version();
 
-				return $language->lang('EXT_PHP_ERROR', $this->php_version, PHP_VERSION);
-			}
-			else
-			{
-				return false;
-			}
+		if (!$enableable)
+		{
+			$language = $this->container->get('language');
+			$language->add_lang('bulkuseradd_install', 'david63/bulkuseradd');
+
+			return $language->lang('BULKUSERADD_NOT_ENABLEABLE');
 		}
 
-		// Check for phpBB version
-		if (!(phpbb_version_compare(PHPBB_VERSION, $this->min_version, '>=') && phpbb_version_compare(PHPBB_VERSION, $this->max_version, '<')))
-		{
-			if (phpbb_version_compare(PHPBB_VERSION, $this->phpbb_version, '>='))
-			{
-				$config		= $this->container->get('config');
-				$language	= $this->container->get('language');
-				$language->add_lang('ext_enable_error', 'david63/'. $this->ext_name);
+		return $enableable;
+	}
 
-				return $language->lang('EXT_ENABLE_ERROR', $this->min_version, $this->max_version, $config['version']);
-			}
-			else
-			{
-				return false;
-			}
-		}
+	/**
+	 * Require phpBB 3.3.19 due to several security fixes in the phpBB software.
+	 * Retain the existing upper limit excluding phpBB 4.0.
+	 *
+	 * @return bool
+	 */
+	protected function check_phpbb_version()
+	{
+		return phpbb_version_compare(PHPBB_VERSION, '3.3.19', '>=')
+			&& phpbb_version_compare(PHPBB_VERSION, '4.0.0-dev', '<');
+	}
 
-		return true;
+	/**
+	 * Requires PHP 8.3.36 due to security fixes.
+	 *
+	 * @return bool
+	 */
+	protected function check_php_version()
+	{
+		return PHP_VERSION_ID >= 80336;
 	}
 }
