@@ -1,10 +1,27 @@
-# EditorConfig is awesome: https://EditorConfig.org
-
-# phpBB - Editor Vorgaben v1 - https://www.phpbb.de/kb/viewarticle?a=93
-# 2020 LukeWCS, phpBB.de
+# EditorConfig
+# https://editorconfig.org/
+#
+# Consistent formatting for project files.
 
 root = true
 
+[*]
+end_of_line = lf
+insert_final_newline = true
+
+[*.{php,js,css,json,html,htm,txt,md,yml,yaml,xml,twig}]
+charset = utf-8
+indent_style = tab
+indent_size = 4
+trim_trailing_whitespace = true
+
+[*.{txt,md,yml,yaml}]
+trim_trailing_whitespace = false
+
+[*.{yml,yaml}]
+indent_style = space
+
+# Existing project-specific settings
 [*]
 end_of_line = lf
 insert_final_newline = true
@@ -19,4 +36,8 @@ trim_trailing_whitespace = true
 trim_trailing_whitespace = false
 
 [*.yml]
+indent_style = space
+
+# YAML requires spaces rather than tabs.
+[*.{yml,yaml}]
 indent_style = space
