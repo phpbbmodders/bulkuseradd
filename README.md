@@ -2,7 +2,7 @@
 
 Adds the ability to add users from an Excel spreadsheet or a CSV file.
 
-> **Slated for archiving.** Adding users from a CSV file is planned for [ACP Add User](https://github.com/phpbbmodders/adduser), so one extension covers both single and bulk adding. Once that ships, this repository will be archived and receive no more updates. ACP Add User will read CSV files only; to import an Excel spreadsheet, save it as CSV from Excel or LibreOffice first.
+> **Archived.** Adding users from a CSV file is now part of [ACP Add User](https://github.com/phpbbmodders/adduser), from version [1.0.7-dev](https://github.com/phpbbmodders/adduser/releases/tag/1.0.7-dev): one extension covers both single and bulk adding. This repository receives no more updates. ACP Add User reads CSV files only; to import an Excel spreadsheet, save it as CSV from Excel or LibreOffice first.
 
 [![Build Status](https://github.com/david63/bulkuseradd/workflows/Tests/badge.svg)](https://github.com/phpbb-extensions/david63/bulkuseradd)
 [![License](https://poser.pugx.org/david63/bulkuseradd/license)](https://packagist.org/packages/david63/bulkuseradd)
